@@ -11,6 +11,8 @@
 (function() {
     'use strict';
 
+    console.log("Start temper monkey")
+
     const copyToClipboard = str => {
         const el = document.createElement('textarea');
         el.value = str;
