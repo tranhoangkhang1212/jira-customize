@@ -83,42 +83,10 @@ GM_addStyle(`
 `);
 
 function addBranchButton() {
-    const lastBreadcrumbsContainer = _.last(document.querySelectorAll('div[data-test-id*="breadcrumbs"]'));
-
-    function removeMask(str) {
-        str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, "a");
-        str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, "e");
-        str = str.replace(/ì|í|ị|ỉ|ĩ/g, "i");
-        str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, "o");
-        str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, "u");
-        str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, "y");
-        str = str.replace(/đ/g, "d");
-        str = str.replace(/À|Á|Ạ|Ả|Ã|Â|Ầ|Ấ|Ậ|Ẩ|Ẫ|Ă|Ằ|Ắ|Ặ|Ẳ|Ẵ/g, "A");
-        str = str.replace(/È|É|Ẹ|Ẻ|Ẽ|Ê|Ề|Ế|Ệ|Ể|Ễ/g, "E");
-        str = str.replace(/Ì|Í|Ị|Ỉ|Ĩ/g, "I");
-        str = str.replace(/Ò|Ó|Ọ|Ỏ|Õ|Ô|Ồ|Ố|Ộ|Ổ|Ỗ|Ơ|Ờ|Ớ|Ợ|Ở|Ỡ/g, "O");
-        str = str.replace(/Ù|Ú|Ụ|Ủ|Ũ|Ư|Ừ|Ứ|Ự|Ử|Ữ/g, "U");
-        str = str.replace(/Ỳ|Ý|Ỵ|Ỷ|Ỹ/g, "Y");
-        str = str.replace(/Đ/g, "D");
-        return str;
-    }
-
+    const ticketId = _.last(document.getElementById("key-val"));
+ 
     function createBranchName() {
-        const issueButton = document.querySelector(
-            '[data-testid="issue.views.issue-base.foundation.change-issue-type.button"]'
-        );
-        const issueType = issueButton.getAttribute("aria-label").split("-")[0].trim();
-        const jiraTitle = _.first(
-            document.querySelectorAll('h1[data-test-id*="issue.views.issue-base.foundation.summary.heading"]')
-        ).innerText;
-        const jiraId = lastBreadcrumbsContainer.innerText;
-        const str = removeMask(jiraTitle.replace(/\[.*?\]/g, ""));
-
-        if (issueType === "Bug") {
-            copy(`bugfix/${jiraId.toLowerCase()}-${_.kebabCase(str)}`);
-        } else {
-            copy(`feature/${jiraId.toLowerCase()}-${_.kebabCase(str)}`);
-        }
+        copy(ticketId);
     }
 
     function copy(value) {
@@ -147,66 +115,9 @@ function addBranchButton() {
         );
         setTimeout(() => $("#copied-txt").remove(), 3000);
     });
-
-    return new Promise(() =>
-        setTimeout(() => {
-            console.log("Created Button");
-        }, 100)
-    );
 }
 
-function addCommitButton() {
-    const lastBreadcrumbsContainer = _.last(document.querySelectorAll('div[data-test-id*="breadcrumbs"]'));
-
-    function createCommitMessage() {
-        const issueButton = document.querySelector(
-            '[data-testid="issue.views.issue-base.foundation.change-issue-type.button"]'
-        );
-        const issueType = issueButton.getAttribute("aria-label").split("-")[0].trim();
-        const jiraTitle = _.first(
-            document.querySelectorAll('h1[data-test-id*="issue.views.issue-base.foundation.summary.heading"]')
-        ).innerText;
-        const jiraId = lastBreadcrumbsContainer.innerText;
-
-        if (issueType === "Bug") {
-            copy(`fix: ${jiraId} ${jiraTitle.replace(/\[.*?\]/g, "")}`.replace("  ", " "));
-        } else {
-            copy(`feat: ${jiraId} ${jiraTitle.replace(/\[.*?\]/g, "")}`.replace("  ", " "));
-        }
-    }
-
-    function copy(value) {
-        const copyText = document.querySelector("#copy-commit-message");
-        copyText.value = value;
-        copyText.select();
-        document.execCommand("copy");
-    }
-
-    const existingButton = document.querySelector(".commit-message");
-    if (!_.isNil(existingButton)) {
-        existingButton.remove();
-    }
-
-    $(lastBreadcrumbsContainer).append(`
-            <div class="copy-commit-msg-btn-wrapper commit-message">
-               <input type="button" class="create-branch-btn" value="Copy Commit Message" id="create-commit-message">
-                <textarea style="opacity: 0; position: absolute; left: 100%" id="copy-commit-message">
-            </div>
-    `);
-
-    $("#create-commit-message").on("click", () => {
-        createCommitMessage();
-        $(".copy-commit-msg-btn-wrapper").append(
-            `<span id="copied-message-txt" style="position: absolute; top: -70%; left: 50%; color: green;">Copied</span>`
-        );
-        setTimeout(() => $("#copied-message-txt").remove(), 3000);
-    });
-}
-
-(async function () {
-    await addBranchButton();
-    addCommitButton();
-})();
+addBranchButton();
 
 let oldURL = "";
 let currentURL = window.location.href;
@@ -216,12 +127,8 @@ function checkURLChange(currentURL) {
         oldURL = currentURL;
     } else {
         const branchNameGeButton = document.querySelector(".branch-name-ge");
-        const commitMessageGeButton = document.querySelector(".commit-message");
         if (!branchNameGeButton) {
             addBranchButton();
-        }
-        if (!commitMessageGeButton) {
-            addCommitButton();
         }
     }
 
