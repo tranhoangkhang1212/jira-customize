@@ -8,6 +8,8 @@
 // @copyright  2012+, You
 // ==/UserScript==
 
+console.log("Start tampermonkey");
+
 // Get iFrame
 const iFrameID = 'gadget-10901';
 //var frame = document.getElementById(iFrameID);
